@@ -3,7 +3,7 @@
 > a zero-lag, system-wide advanced easy translation overlay with deep hardware integration, offline support, and weabooo ui.
 
 <p align="center">
-  <img src="ss.png" alt="xyz translate screenshot" width="800">
+  <img src="ss.png" alt="xyz translate screenshot" width="400">
 </p>
 
 ## core features
