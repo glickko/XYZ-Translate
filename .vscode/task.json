@@ -1,0 +1,36 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "CMake: Configure",
+            "type": "shell",
+            "command": "D:\\Extras\\Coding\\C\\msys64\\ucrt64\\bin\\cmake.exe",
+            "args": [
+                "-B",
+                "build",
+                "-G",
+                "Ninja",
+                "-DCMAKE_BUILD_TYPE=Debug"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "CMake: Build (Ctrl+Shift+B)",
+            "type": "shell",
+            "command": "D:\\Extras\\Coding\\C\\msys64\\ucrt64\\bin\\cmake.exe",
+            "args": [
+                "--build",
+                "build"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": "CMake: Configure",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        }
+    ]
+}
