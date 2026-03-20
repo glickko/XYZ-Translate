@@ -2,7 +2,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <dwmapi.h>
-#include <shobjidl.h> // Untuk AppUserModelID (Taskbar Fix)
+#include <shobjidl.h> //taskbar
 
 #include <QApplication>
 #include <QMainWindow>
@@ -62,7 +62,7 @@
 #include <mutex>
 #include <functional>
 
-// --- [CIEL V5] STEALTH & HOOK GLOBALS ---
+//stleath hook
 std::mutex g_bufferMutex;
 std::wstring g_smartBuffer;
 QPointer<QMainWindow> g_mainWindow;
@@ -79,7 +79,7 @@ UINT g_modWriter = MOD_ALT;
 UINT g_vkWriter = 0x57; // W
 UINT g_modReader = MOD_ALT;
 UINT g_vkReader = 0x51; // Q
-// ----------------------------------------
+
 
 //smart path
 QString getDir(const QString& folderName) {
@@ -272,7 +272,7 @@ QString humanizeText(QString text, const QString& origText, bool isWriter, bool 
     return text + " ";
 }
 
-// --- [CIEL V5] WIN32 HARDWARE INPUT HELPERS ---
+//hw input helper
 void HardwareKeyAction(WORD vkCode, bool release = false) {
     INPUT input = {}; input.type = INPUT_KEYBOARD;
     input.ki.wScan = MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC);
@@ -462,7 +462,7 @@ class SettingsDialog : public QDialog {
     QTextEdit *writerPromptInput, *readerPromptInput;
     QKeySequenceEdit *hotkeyWriter, *hotkeyReader;
     QCheckBox *chkSlang, *chkDeleteOriginal, *chkAutoStart;
-    QCheckBox *chkStealthMode; // --- [CIEL V5] STEALTH CHECKBOX ---
+    QCheckBox *chkStealthMode; //stleath checkbox
 
 public:
     SettingsDialog(QSettings& s, QWidget* parent = nullptr) : QDialog(parent), settings(s) {
@@ -511,7 +511,7 @@ public:
         chkSlang = new QCheckBox("Lowercased natural output (Writer)"); chkSlang->setChecked(settings.value("SlangMode", true).toBool()); contentLayout->addWidget(chkSlang);
         chkDeleteOriginal = new QCheckBox("Erase source text before translation"); chkDeleteOriginal->setChecked(settings.value("DeleteOriginal", true).toBool()); contentLayout->addWidget(chkDeleteOriginal);
         
-        // --- [CIEL V5] STEALTH CHECKBOX INJECTION ---
+        //stleath mode injection
         chkStealthMode = new QCheckBox("⚡ Stealth Hook Mode (Anti-Ding & Anti-Desync)");
         chkStealthMode->setChecked(settings.value("StealthMode", false).toBool());
         contentLayout->addWidget(chkStealthMode);
@@ -535,7 +535,7 @@ private slots:
         settings.setValue("ReaderPrompt", readerPromptInput->toPlainText()); settings.setValue("HotkeyWriter", hotkeyWriter->keySequence().toString()); settings.setValue("HotkeyReader", hotkeyReader->keySequence().toString()); 
         settings.setValue("SlangMode", chkSlang->isChecked()); settings.setValue("DeleteOriginal", chkDeleteOriginal->isChecked());
         
-        // --- [CIEL V5] SIMPAN STATE STEALTH ---
+        //save stleath
         settings.setValue("StealthMode", chkStealthMode->isChecked());
         g_stealthMode = chkStealthMode->isChecked();
         // --------------------------------------
@@ -566,7 +566,7 @@ public:
     XYZControlCenter() : settings(getDir("Data") + "config.ini", QSettings::IniFormat) {
         g_mainWindow = this;
         
-        // --- [CIEL V5] LOAD STEALTH STATE AWAL ---
+        //load stleath old
         g_stealthMode = settings.value("StealthMode", false).toBool();
         // -----------------------------------------
 
@@ -755,7 +755,7 @@ public slots:
         cmbWriter->blockSignals(false); cmbReader->blockSignals(false);
     }
 
-    // --- [CIEL V5] CLIPBOARD FIX: Phantom Pulse Anti-Desync ---
+    //anti dsync
     void fetchClipboardAsync(std::function<void(QString)> callback) {
         QClipboard* clipboard = QGuiApplication::clipboard();
         backupClip = clipboard->text(); clipboard->clear();
@@ -1112,7 +1112,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
         
         if (pKeyBoard->flags & LLKHF_INJECTED) return CallNextHookEx(g_kbdHook, nCode, wParam, lParam);
 
-        // --- [CIEL V5] STEALTH MODE: ANTI-DING PROTOCOL (KEYUP PHASE) ---
+        //anti ding
         if (g_stealthMode && (wParam == WM_KEYUP || wParam == WM_SYSKEYUP)) {
             if (pKeyBoard->vkCode == VK_RETURN && g_swallowNextEnterUp) {
                 g_swallowNextEnterUp = false; return 1; 
@@ -1135,7 +1135,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
             bool writerMatch = (pKeyBoard->vkCode == g_vkWriter) && (ctrl == ((g_modWriter & MOD_CONTROL) != 0)) && (alt == ((g_modWriter & MOD_ALT) != 0)) && (shift == ((g_modWriter & MOD_SHIFT) != 0));
             bool readerMatch = (pKeyBoard->vkCode == g_vkReader) && (ctrl == ((g_modReader & MOD_CONTROL) != 0)) && (alt == ((g_modReader & MOD_ALT) != 0)) && (shift == ((g_modReader & MOD_SHIFT) != 0));
 
-            // --- [CIEL V5] ACTION TRIGGERS (THE F24 PHANTOM CHEAT) ---
+            //f24 cheat
             if (writerMatch) { 
                 if (g_stealthMode) {
                     g_swallowWriterUp = true; 
